@@ -51,8 +51,8 @@ client
         // Slice the content to only get the part of the message coming *after* "im"
         const new_name = m.content.slice(trigger_position + match.length);
 
-        // If this persons nickname is already going to be what comes after im, then why bother wasting api calls
-        if (new_name === m.member.nickname) return;
+        // If this persons nickname is already going to be what comes after im, or maybe greater than 32 chars, then why bother wasting api calls
+        if (new_name === m.member.nickname || new_name.length > 32) return;
 
         await m.member.setNickname(new_name);
 
