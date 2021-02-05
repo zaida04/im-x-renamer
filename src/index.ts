@@ -6,7 +6,7 @@ const client = new Client({
     messageCacheLifetime: 5,
     messageSweepInterval: 5,
     
-    // Minimal amount of intents needed to recieve messages sent in a guild.
+    // Minimal amount of intents needed to receive messages sent in a guild.
     ws: { intents: ["GUILDS", "GUILD_MESSAGES"] },
 });
 
@@ -14,7 +14,7 @@ const client = new Client({
 const context = {
     cooldown: new Collection<string, number>(),
     // The words that'll trigger the renames
-    trigger: /\b(i'm|im)\b/g,
+    trigger: /\b(i'm|im)\b/gi,
     // How long the cooldowns last
     cooldownAmt: process.env.COOLDOWNAMT ? Number(process.env.COOLDOWNAMT) : 60,
 };
