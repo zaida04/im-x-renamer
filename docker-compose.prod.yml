@@ -1,0 +1,8 @@
+version: '2.2'
+
+services:
+  bot:
+    image: zaid450/imx
+    restart: unless-stopped
+    env_file:
+      - .env

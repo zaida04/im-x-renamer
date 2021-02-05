@@ -1,0 +1,27 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "ignorePatterns": [
+        "node_modules/**",
+        "dist/**"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "project": "./tsconfig.json"
+    },
+    "extends": [
+        "marine/prettier/node",
+        "plugin:@typescript-eslint/recommended",
+        "prettier/@typescript-eslint",
+        "plugin:prettier/recommended"
+    ],
+    "rules": {
+        "linebreak-style": "off",
+        "prettier/prettier": [
+            "warn",
+            {
+                "endOfLine": "auto"
+            }
+        ]
+    }
+}
