@@ -17,6 +17,9 @@
     ],
     "rules": {
         "linebreak-style": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-misused-promises": "off",
         "prettier/prettier": [
             "warn",
             {

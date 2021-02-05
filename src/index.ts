@@ -4,39 +4,40 @@ const client = new Client({
     messageCacheLifetime: 5,
     messageSweepInterval: 5,
     partials: ["MESSAGE"],
-    ws: { intents: ["GUILDS", "GUILD_MESSAGES"] }
+    ws: { intents: ["GUILDS", "GUILD_MESSAGES"] },
 });
 
 const context = {
     cooldown: new Collection<string, number>(),
     trigger: /\b(i'm|im)\b/g,
-    cooldownAmt: process.env.COOLDOWNAMT ? Number(process.env.COOLDOWNAMT) : 60
-}
+    cooldownAmt: process.env.COOLDOWNAMT ? Number(process.env.COOLDOWNAMT) : 60,
+};
 
 client
-    .on("ready", () => Logger.log(`Logged in to ${client.user.tag}`))
-    .on("inhibited", (str) => Logger.warn(`[INHIBITED] ${str}`))
+    .on("ready", () => Logger.log(`Logged in to ${client.user!.tag}`))
+    .on("inhibited", (str: string) => Logger.warn(`[INHIBITED] ${str}`))
     .on("message", async (m) => {
-    if(!m.member.manageable) return;
-    if(!m.guild.me.hasPermission("MANAGE_NICKNAMES")) return client.emit("inhibited", `Don't got MANAGE_NICKNAME perms in ${m.guild.name} (${m.guild.id})`)
-    if(context.cooldown.has(m.author.id)) {
-        if(Date.now() > context.cooldown.get(m.author.id)) context.cooldown.delete(m.author.id);  
-        else return client.emit("inhibited", "This person's on cooldown!");
-    }
+        if (!m.member?.manageable) return;
+        if (!m.guild!.me?.hasPermission("MANAGE_NICKNAMES"))
+            return client.emit("inhibited", `Don't got MANAGE_NICKNAME perms in ${m.guild!.name} (${m.guild!.id})`);
+        if (context.cooldown.has(m.author.id)) {
+            if (Date.now() > context.cooldown.get(m.author.id)!) context.cooldown.delete(m.author.id);
+            else return client.emit("inhibited", "This person's on cooldown!");
+        }
 
-    const m_LC = m.content.toLowerCase();
-    const [match] = m.content.match(context.trigger)
-    if(!match) return;
-    const trigger_position = m_LC.indexOf(match);
-    if(trigger_position === -1) return;
-    const new_name = m.content.slice(trigger_position + match.length);
-    if(new_name === m.member.nickname) return;
-    await m.member.setNickname(new_name);
-    context.cooldown.set(m.author.id, Date.now() * (context.cooldownAmt * 1000));
-});
+        const m_LC = m.content.toLowerCase();
+        const match = context.trigger.exec(m.content);
+        if (!match || !match[0]) return;
+        const trigger_position = m_LC.indexOf(match[0]);
+        if (trigger_position === -1) return;
+        const new_name = m.content.slice(trigger_position + match.length);
+        if (new_name === m.member.nickname) return;
+        await m.member.setNickname(new_name);
+        context.cooldown.set(m.author.id, Date.now() * (context.cooldownAmt * 1000));
+    });
 
-class Logger {
-    private static base(type: string, value: string, color: string) {
+const Logger = {
+    base: (type: string, value: string, color: string) => {
         const used_mem: number = process.memoryUsage().heapUsed / 1024 / 1024;
 
         let outputBuilder = "";
@@ -45,22 +46,23 @@ class Logger {
             colors.DIM
         }`.trim();
 
-        outputBuilder += `[${(Math.round(used_mem * 100) / 100).toFixed(2)} MB]${
-            this.name ? `[${this.name}]` : ""
-        }[${type}]:${colors.BRIGHT}`.trim();
+        outputBuilder += `[${(Math.round(used_mem * 100) / 100).toFixed(2)} MB]}[${type}]:${colors.BRIGHT}`.trim();
 
         return console.log(outputBuilder, value, colors.RESET);
-    }
-    public static log(value: string, color?: colors) {
+    },
+
+    log: (value: string, color?: colors) => {
         return Logger.base("INFO", value, color ? color : colors.GREEN);
-    }
-    public static warn(value: string, color?: colors) {
+    },
+
+    warn: (value: string, color?: colors) => {
         return Logger.base("WARN", value, color ? color : colors.YELLOW);
-    }
-    public static error(value: string | Error) {
+    },
+
+    error: (value: string | Error) => {
         return Logger.base("ERR", value instanceof Error ? value.message : value, colors.RED);
-    }
-}
+    },
+};
 
 enum colors {
     RESET = "\x1b[0m",
@@ -88,4 +90,4 @@ enum colors {
     BGWHITE = "\x1b[47m",
 }
 
-client.login();
+void client.login();
